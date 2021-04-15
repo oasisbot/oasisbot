@@ -1,8 +1,9 @@
 package run
 
 import (
-	"log"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 
 	"oasisbot/internal/api"
 	"oasisbot/internal/bot"
@@ -27,13 +28,26 @@ func Init() {
 		os.Exit(1)
 	}
 
+	log.SetFormatter(&log.TextFormatter{
+		ForceColors: true,
+	})
+
 	if !args.Prod && !args.Debug {
 		log.Fatal("specify --prod or --debug to run")
 	} else if args.Prod && args.Debug {
 		log.Fatal("must specify either --prod or --debug")
 	}
 
-	log.Println("Starting OasisBot...")
+	mode := "production"
+	if args.Debug {
+		mode = "debug"
+		log.SetLevel(log.TraceLevel)
+	} else {
+		log.SetLevel(log.InfoLevel)
+	}
+	log.WithFields(log.Fields{
+		"mode": mode,
+	}).Info("Starting OasisBot...")
 
 	common.RegisterOptions()
 	err := common.LoadConfig()

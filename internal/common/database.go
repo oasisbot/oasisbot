@@ -3,8 +3,9 @@ package common
 import (
 	"context"
 	"errors"
-	"log"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -17,6 +18,7 @@ const (
 
 	COL_GUILDS   = "guilds"
 	COL_COMMANDS = "commands"
+	COL_POLLS = "polls"
 )
 
 func Connect(ctx context.Context) *mongo.Client {
@@ -36,7 +38,7 @@ func InitDB() {
 	client := Connect(ctx)
 	defer client.Disconnect(ctx)
 	defer cancel()
-	log.Println("Connected to MongoDB!")
+	log.Info("Established connection with MongoDB")
 }
 
 func AddGuild(id string) error {

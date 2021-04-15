@@ -16,6 +16,8 @@ var (
 
 	ConfDomain            *config.Option
 	ConfDeveloperServerID *config.Option
+
+	ConfPluginPollInterval *config.Option
 )
 
 var loaded = false
@@ -29,6 +31,8 @@ func RegisterOptions() {
 
 	ConfDomain = config.RegisterOption("oasisbot.domain", "The domain of the website for the bot", "")
 	ConfDeveloperServerID = config.RegisterOption("oasisbot.developer_server_id", "The ID for the main developer server", "")
+
+	ConfPluginPollInterval = config.RegisterOption("oasisbot.plugins.polls.interval", "The interval, in seconds, at which the polls plugin will check for updates", 60)
 }
 
 func LoadConfig() error {

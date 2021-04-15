@@ -43,7 +43,7 @@ export default function Commands () {
 
     if (!guild) return null
 
-    const onCommandToggle = async (c: Command, enabled: boolean) => {
+    const onCommandToggle = async (c: Command) => {
         if (!commands) return
         var xhr = new XMLHttpRequest()
         xhr.open('PATCH', `/api/plugins/commands/${c.Name}?id=${guild.ID}`)

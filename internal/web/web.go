@@ -12,7 +12,6 @@ import (
 	"oasisbot/internal/cache"
 	"oasisbot/internal/common"
 	"oasisbot/internal/common/endpoints"
-	"oasisbot/internal/customcommands"
 	"oasisbot/internal/util"
 	"os"
 	"time"
@@ -35,7 +34,7 @@ var clients map[string]*Client
 func Run(address string) {
 	ctx := context.Background()
 	g, ctx := errgroup.WithContext(ctx)
-	r := chi.NewRouter()
+	r := common.CreateMux()
 
 	clients = map[string]*Client{}
 
@@ -292,71 +291,11 @@ func Run(address string) {
 						w.WriteHeader(http.StatusInternalServerError)
 					}
 				})
-
-				r.Get("/api/plugins/commands", func(w http.ResponseWriter, r *http.Request) {
-					id := r.Context().Value("guildID")
-					commands := customcommands.GetAllCommandsInGuild(id.(string))
-					a := []customcommands.Command{}
-					for _, c := range commands {
-						a = append(a, *c)
-					}
-					json.NewEncoder(w).Encode(a)
-				})
-
-				r.Post("/api/plugins/commands", func(w http.ResponseWriter, r *http.Request) {
-					// TODO: Permission checking to see if user has permission to add a command
-					id := r.Context().Value("guildID")
-
-					defer r.Body.Close()
-					body, _ := ioutil.ReadAll(r.Body)
-					var command customcommands.Command
-					json.Unmarshal(body, &command)
-					if !customcommands.ValidateCommand(id.(string), &command) {
-						w.WriteHeader(http.StatusNotAcceptable)
-						return
-					}
-
-					if err := customcommands.AddCommand(id.(string), &command); err == nil {
-						json.NewEncoder(w).Encode(command)
-					} else {
-						w.WriteHeader(http.StatusBadRequest)
-					}
-				})
-
-				r.Patch("/api/plugins/commands/{commandName}", func(w http.ResponseWriter, r *http.Request) {
-					id := r.Context().Value("guildID")
-					commandName := chi.URLParam(r, "commandName")
-
-					defer r.Body.Close()
-					body, _ := ioutil.ReadAll(r.Body)
-					var command customcommands.Command
-					json.Unmarshal(body, &command)
-					if !customcommands.ValidateCommand(id.(string), &command) {
-						w.WriteHeader(http.StatusNotAcceptable)
-						return
-					}
-
-					if err := customcommands.UpdateCommand(id.(string), commandName, &command); err == nil {
-						json.NewEncoder(w).Encode(command)
-					} else {
-						w.WriteHeader(http.StatusBadRequest)
-						return
-					}
-				})
-
-				r.Delete("/api/plugins/commands/{commandName}", func(w http.ResponseWriter, r *http.Request) {
-					id := r.Context().Value("guildID")
-					commandName := chi.URLParam(r, "commandName")
-
-					if err := customcommands.DeleteCommand(id.(string), commandName); err != nil {
-						w.WriteHeader(http.StatusBadRequest)
-					} else {
-						w.WriteHeader(http.StatusOK)
-					}
-				})
 			})
 		})
 	})
+
+	common.WebInit()
 
 	runServer(ctx, g, address, r)
 	exitErr := g.Wait()

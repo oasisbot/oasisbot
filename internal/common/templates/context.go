@@ -184,6 +184,7 @@ func baseContextFuncs(c *Context) {
 	// Getters
 	c.CtxFuncs["getRole"] = c.getRole
 	c.CtxFuncs["getMember"] = c.getMember
+	c.CtxFuncs["getChannel"] = c.getChannel
 
 	// Roles
 	c.CtxFuncs["hasRoleID"] = c.hasRoleID

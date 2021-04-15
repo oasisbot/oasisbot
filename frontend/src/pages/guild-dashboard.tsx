@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { makeStyles, createStyles, Theme } from '@material-ui/core'
-import { Route, Switch, useHistory, withRouter } from 'react-router-dom'
+import { Redirect, Route, Switch, useHistory, withRouter } from 'react-router-dom'
 
 import GuildBar from '../components/guild-bar'
 import PageHeader from './guild-dashboard/page-header'
@@ -39,22 +39,20 @@ export function GuildDashboard () {
     React.useEffect(() => {
         const doFetch = async () => {
             if (!userData.done) return
-
             if (userData.user == undefined) {
                 history.push('/login')
                 return
             }
 
             let result = await fetch(`/api/guild_data?id=${common.GetDashboardID()}`)
-
             let data = await result.body?.getReader().read()
             if (!data || result.status !== 200) {
                 setTimeout(() => {
                     switch (result.status) {
-                        case 423: { setLoadingErr("Unable to retrive server data"); break }
+                        case 423: { setLoadingErr("Unable to retrieve server data"); break }
                         case 401: { setLoadingErr("We can't show you that!"); break }
                     }
-                }, 1650)
+                }, 450)
                 return
             }
             const guild = JSON.parse(new TextDecoder().decode(data.value)) as Guild
@@ -65,7 +63,6 @@ export function GuildDashboard () {
             if (result.status === 401) { 
                 window.location.href = '/login'
             } 
-
             data = await result.body?.getReader().read()
             if (!data) return
             let unsorted = JSON.parse(new TextDecoder().decode(data.value)) as GuildPreview[]
@@ -108,23 +105,26 @@ export function GuildDashboard () {
                 </Route>
                 <Route exact path='/d/:id/polls'>
                     <PageHeader index={1}/>
-                    <Commands />
+                    {/* <Commands /> */}
                 </Route>
                 <Route exact path='/d/:id/giveaways'>
                     <PageHeader index={2}/>
-                    <Commands />
+                    {/* <Commands /> */}
                 </Route>
                 <Route exact path='/d/:id/embeds'>
                     <PageHeader index={3}/>
-                    <Commands />
+                    {/* <Commands /> */}
                 </Route>
                 <Route exact path='/d/:id/actions'>
                     <PageHeader index={4}/>
-                    <Commands />
+                    {/* <Commands /> */}
                 </Route>
                 <Route exact path='/d/:id/help'>
                     <PageHeader index={5}/>
-                    <Commands />
+                    {/* <Commands /> */}
+                </Route>
+                <Route path='/d/:id'>
+                    <Redirect to={`/d/${guild.ID}`}/>
                 </Route>
             </Switch>
         </GuildContext.Provider>

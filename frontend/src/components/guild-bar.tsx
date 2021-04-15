@@ -140,7 +140,6 @@ export default function GuildBar (props: GuildBarProps) {
             case `/d/${props.guild.ID}`: setPageIndex(0); break
             case `/d/${props.guild.ID}/settings`: setPageIndex(1); break
             case `/d/${props.guild.ID}/help`: setPageIndex(2); break
-            default: history.push(`/d/${props.guild.ID}`); break
         }
     }, [])
 

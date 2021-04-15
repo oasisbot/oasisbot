@@ -69,9 +69,9 @@ func (o *Option) LoadValue() {
 	// Use defaultValue to parse loaded value
 	if o.DefaultValue != nil {
 		if _, ok := o.DefaultValue.(int); ok {
-			val = interface{}(int(val.(int)))
+			val = interface{}(intVal(val))
 		} else if _, ok := o.DefaultValue.(bool); ok {
-			val = interface{}(bool(val.(bool)))
+			val = interface{}(boolVal(val))
 		}
 	}
 

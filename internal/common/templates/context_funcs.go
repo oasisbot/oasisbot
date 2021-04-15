@@ -148,6 +148,18 @@ func (c *Context) getMember(userID interface{}) interface{} {
 	return *member
 }
 
+func (c *Context) getChannel(channelID interface{}) interface{} {
+	cid := c.ChannelArg(channelID)
+	if cid == "" {
+		return nil
+	}
+	channel, err := common.BotSession.State.GuildChannel(c.Guild.ID, cid)
+	if err != nil {
+		return nil
+	}
+	return channel
+}
+
 func (c *Context) hasRoleID(roleID interface{}) bool {
 	role := RoleIDArg(roleID)
 	if role == "" {

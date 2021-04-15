@@ -1,6 +1,8 @@
 package common
 
-import "log"
+import (
+	log "github.com/sirupsen/logrus"
+)
 
 var Plugins []Plugin
 
@@ -10,5 +12,5 @@ type Plugin interface {
 
 func RegisterPlugin(p Plugin) {
 	Plugins = append(Plugins, p)
-	log.Println("Registered plugin", p.GetName())
+	log.Info("Registered plugin ", p.GetName())
 }

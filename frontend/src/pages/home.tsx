@@ -1,4 +1,3 @@
-import React from 'react'
 import { 
     makeStyles, 
     createStyles, 
@@ -7,20 +6,12 @@ import {
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        root: {
-            height: '100%'
-        },
-        paper: {
-            padding: theme.spacing(2),
-        },
+        root: { height: '100%' },
+        paper: { padding: theme.spacing(2) }
     })
 );
 
 export const Home = () => {
     const classes = useStyles()
-
-    return (
-        <div className={classes.root}>
-        </div>
-    )
+    return <div className={classes.root} />
 }

@@ -2,8 +2,9 @@ package customcommands
 
 import (
 	"errors"
-	"log"
 	"oasisbot/internal/common"
+	"oasisbot/internal/logs"
+	"oasisbot/internal/util"
 	"regexp"
 )
 
@@ -15,6 +16,10 @@ func (p *Plugin) GetName() string {
 	return pluginName
 }
 
+var (
+	logger = logs.PluginLogger(&Plugin{})
+)
+
 func RegisterPlugin() {
 	plugin := &Plugin{}
 	common.RegisterPlugin(plugin)
@@ -22,7 +27,7 @@ func RegisterPlugin() {
 	cache = make(map[string]map[string]*Command)
 	commands, err := getAllCommands()
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal(err)
 	}
 
 	for _, c := range commands {
@@ -32,36 +37,13 @@ func RegisterPlugin() {
 		store := c // https://stackoverflow.com/questions/48826460/using-pointers-in-a-for-loop
 		cache[c.GuildID][c.Name] = &store
 	}
+
+	size, err := util.GetRealSizeOf(commands)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	logger.Info("Custom commands loaded; total size ", size, " bytes")
 }
-
-type CommandType int
-
-const CommandTypeBasic = CommandType(0)
-const CommandTypeRandomized = CommandType(1)
-const CommandTypeRole = CommandType(3)
-const CommandTypeAdvanced = CommandType(4)
-
-type Command struct {
-	GuildID           string      `bson:"guildID"`
-	Name              string      `bson:"name"`
-	Description       string      `bson:"description"`
-	Enabled           bool        `bson:"enabled"`
-	Type              CommandType `bson:"type"`
-	Responses         []string    `bson:"responses"`
-	AssignedRoles     []string    `bson:"assigned_roles"`
-	AllowedRoles      []string    `bson:"allowed_roles"`
-	ForbiddenRoles    []string    `bson:"forbidden_roles"`
-	ForbiddenChannels []string    `bson:"forbidden_channels"`
-}
-
-const (
-	MAX_COMMAND_NAME_LEN            = 32
-	MAX_COMMAND_DESC_LEN            = 128
-	MAX_COMMAND_RESP_LEN            = 2000
-	MAX_COMMAND_RESP_COUNT          = 40
-	MAX_COMMAND_ASSIGNED_ROLE_COUNT = 10
-	REX_COMMAND_NAME                = `^[a-z0-9\-]+$`
-)
 
 // "guildID": { "commandName": value }
 var cache map[string]map[string]*Command
