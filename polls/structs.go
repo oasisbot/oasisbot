@@ -17,5 +17,7 @@ type FrontendPoll struct {
 }
 
 type PollCreate struct {
-	
+	ChannelID string `json:"channel_id"`
+	Message   string `json:"message"`
+	EndsAt    int64  `bson:"ends_at"`
 }

@@ -1,8 +1,8 @@
 {
-  "short_name": "Oasis Bot",
-  "name": "Oasis Bot",
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+	"short_name": "Oasis Bot",
+	"name": "Oasis Bot",
+	"start_url": ".",
+	"display": "standalone",
+	"theme_color": "#000000",
+	"background_color": "#ffffff"
 }

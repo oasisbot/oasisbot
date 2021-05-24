@@ -1,6 +1,7 @@
 package polls
 
 import (
+	"oasisbot/bot"
 	"oasisbot/common"
 	"time"
 
@@ -84,8 +85,11 @@ func NewPoll(guildID string, channelID string, content string, endTimestamp int6
 	return <- result
 }
 
-func ValidPoll(poll *Poll) bool {
-	
+func ValidPoll(guildID string, poll *PollCreate) bool {
+	if !bot.ValidChannel(guildID, poll.ChannelID) {
+		return false
+	}
+	return true
 }
 
 func GetAllPollsInGuild(guildID string) map[string]*Poll {

@@ -43,12 +43,14 @@ func (p *Plugin) WebInit() {
 
 			defer r.Body.Close()
 			body, _ := ioutil.ReadAll(r.Body)
-			var poll Poll
+			var poll PollCreate
 			json.Unmarshal(body, &poll)
-			if !ValidateCommand(id.(string), &poll) {
+			if !ValidPoll(id.(string), &poll) {
 				w.WriteHeader(http.StatusNotAcceptable)
 				return
 			}
+
+			
 		})
 	})
 }
