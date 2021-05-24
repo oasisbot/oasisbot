@@ -6,6 +6,7 @@ import GuildBar from '../components/guild-bar'
 import PageHeader from './guild-dashboard/page-header'
 import Home from './guild-dashboard/home'
 import Commands from './guild-dashboard/commands/commands'
+import Polls from './guild-dashboard/polls/polls'
 
 import { Guild, GuildPreview, SettingsReq } from '../protocol'
 import { UserContext } from '../app'
@@ -101,11 +102,11 @@ export function GuildDashboard () {
                 </Route>
                 <Route exact path='/d/:id/commands'>
                     <PageHeader index={0}/>
-                    <Commands />
+                    <Commands/>
                 </Route>
                 <Route exact path='/d/:id/polls'>
                     <PageHeader index={1}/>
-                    {/* <Commands /> */}
+                    <Polls/>
                 </Route>
                 <Route exact path='/d/:id/giveaways'>
                     <PageHeader index={2}/>

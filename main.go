@@ -1,9 +1,9 @@
 package main
 
 import (
-	"oasisbot/internal/common/run"
-	"oasisbot/internal/customcommands"
-	"oasisbot/internal/polls"
+	"oasisbot/common/run"
+	"oasisbot/customcommands"
+	"oasisbot/polls"
 )
 
 func main() {
