@@ -2,7 +2,6 @@ import {
 	makeStyles,
 	Theme,
 	createStyles,
-	Input,
 	ListItemText,
 	List,
 	ListItem,
@@ -10,8 +9,8 @@ import {
 } from '@material-ui/core'
 import React from 'react'
 import { Channel } from '../../protocol'
+import Search from '../common/search'
 
-import SearchIcon from '@material-ui/icons/Search'
 import HashIcon from '../../assets/channels/hash.svg'
 
 const useStyles = makeStyles<Theme>((theme: Theme) =>
@@ -23,31 +22,6 @@ const useStyles = makeStyles<Theme>((theme: Theme) =>
 			borderRadius: '5px',
 			overflow: 'hidden',
 			boxShadow: '0 3px 15px 4px rgb(0, 0, 0, 20%)',
-		},
-		search: {
-			width: '100%',
-			height: '50px',
-			backgroundColor: theme.palette.background.default,
-			display: 'flex',
-			flexFlow: 'row',
-			boxShadow: '0 3px 10px 2px rgb(0, 0, 0, 20%)',
-		},
-		searchLeft: {
-			height: '100%',
-			width: '50px',
-			display: 'flex',
-			justifyContent: 'center',
-			alignItems: 'center',
-		},
-		searchRight: {
-			height: '100%',
-			flex: '1',
-			display: 'flex',
-			alignItems: 'center',
-			paddingRight: '20px',
-		},
-		input: {
-			width: '100%',
 		},
 		list: {
 			height: 300,
@@ -114,19 +88,7 @@ export default function ChannelSelect({
 			onClose={onClose}
 		>
 			<div className={classes.channelSelect}>
-				<div className={classes.search}>
-					<div className={classes.searchLeft}>
-						<SearchIcon />
-					</div>
-					<div className={classes.searchRight}>
-						<Input
-							className={classes.input}
-							color="secondary"
-							placeholder="Search"
-							onChange={handleSearch}
-						/>
-					</div>
-				</div>
+				<Search handleSearch={handleSearch} />
 				<List className={classes.list}>
 					{displayedChannels.length === 0 ? (
 						<p>No channels to display</p>
