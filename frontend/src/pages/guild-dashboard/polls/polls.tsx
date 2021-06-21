@@ -34,6 +34,7 @@ export default function Polls() {
 				anchor={emojiPickerAnchor}
 				open={emojiPickerOpen}
 				onClose={() => setEmojiPickerOpen(false)}
+				onEmojiSelect={() => {}}
 			/>
 		</>
 	)

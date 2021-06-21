@@ -15,6 +15,7 @@ type Command struct {
 	Type              CommandType `bson:"type"`
 	Responses         []string    `bson:"responses"`
 	AssignedRoles     []string    `bson:"assigned_roles"`
+	PostReaction      string      `bson:"post_reactions"`
 	AllowedRoles      []string    `bson:"allowed_roles"`
 	ForbiddenRoles    []string    `bson:"forbidden_roles"`
 	ForbiddenChannels []string    `bson:"forbidden_channels"`

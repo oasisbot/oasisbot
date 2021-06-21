@@ -1,7 +1,8 @@
 import React from 'react'
 import { makeStyles, createStyles, Theme, Popover } from '@material-ui/core'
 import json from './data/emoji.json'
-import Twemoji from './twemoji'
+import twemoji from 'twemoji'
+import { TwemojiSheet } from './twemoji'
 import { List, ListRowProps } from 'react-virtualized'
 
 import Search from '../common/search'
@@ -66,14 +67,33 @@ const useStyles = makeStyles((theme: Theme) =>
 export interface EmojiPickerProps {
 	anchor: HTMLElement | undefined
 	open: boolean
-	// onEmojiSelect: (emoji: Emoji) => void
+	onEmojiSelect: (emoji: string) => void
 	onClose: () => void
 }
 
-export default function EmojiPicker({ anchor, open, onClose }: EmojiPickerProps) {
+export default function EmojiPicker({
+	anchor,
+	open,
+	onClose,
+	onEmojiSelect
+}: EmojiPickerProps) {
 	const emojis = collectionToBlock()
 	const list: React.RefObject<List> = React.createRef()
 	const [currentHover, setCurrentHover] = React.useState<any>(undefined)
+	const [shiftDown, setShiftDown] = React.useState(false)
+
+	React.useEffect(() => {
+		document.addEventListener('keydown', event => {
+			if (event.shiftKey) {
+				setShiftDown(true)
+			}
+		})
+		document.addEventListener('keyup', event => {
+			if (event.keyCode == 16) {
+				setShiftDown(false)
+			}
+		})
+	}, [])
 
 	const renderRow = ({ key, index, isScrolling, style }: ListRowProps) => {
 		return (
@@ -91,6 +111,12 @@ export default function EmojiPicker({ anchor, open, onClose }: EmojiPickerProps)
 									emoji={emoji}
 									classes={classes}
 									onHover={(e: any) => setCurrentHover(e)}
+									onClick={(e: any) => {
+										onEmojiSelect(twemoji.convert.fromCodePoint(e.code_points.output))
+										if (!shiftDown) {
+											onClose()
+										}
+									}}
 								/>
 							)
 						}
@@ -102,7 +128,12 @@ export default function EmojiPicker({ anchor, open, onClose }: EmojiPickerProps)
 
 	const classes = useStyles()
 	return (
-		<Popover id="emoji-picker" open={open} anchorEl={anchor} onClose={() => onClose()}>
+		<Popover
+			id="emoji-picker"
+			open={open}
+			anchorEl={anchor}
+			onClose={() => onClose()}
+		>
 			<div className={classes.emojiPicker}>
 				<div className={classes.topSplit}>
 					<Search handleSearch={() => {}} />
@@ -135,7 +166,7 @@ function Tooltip({ emoji }: TooltipProps) {
 			{emoji ? (
 				<>
 					<div style={{ width: '35px', height: '35px' }}>
-						<Twemoji emoji={emoji.code_points.output} />
+						<TwemojiSheet emoji={emoji.code_points.output} />
 					</div>
 					<div
 						style={{
@@ -168,9 +199,13 @@ function Tooltip({ emoji }: TooltipProps) {
 	)
 }
 
-const EmojiItem = React.memo(({ emoji, classes, onHover }: any) => {
+const EmojiItem = React.memo(({ emoji, classes, onHover, onClick }: any) => {
 	return (
-		<div className={classes.emoji} onMouseEnter={() => onHover(emoji)}>
+		<div
+			className={classes.emoji}
+			onMouseEnter={() => onHover(emoji)}
+			onClick={(e) => onClick(emoji)}
+		>
 			<div
 				style={{
 					position: 'absolute',
@@ -181,7 +216,7 @@ const EmojiItem = React.memo(({ emoji, classes, onHover }: any) => {
 					padding: '3.5px',
 				}}
 			>
-				<Twemoji emoji={emoji.code_points.output} />
+				<TwemojiSheet emoji={emoji.code_points.output} />
 			</div>
 		</div>
 	)
@@ -198,7 +233,7 @@ function collectionToBlock() {
 			let emoji = emojiTup[1]
 			let category = emoji.category
 
-			if (emoji.diversity !== null) {
+			if (emoji.diversity != null || emoji.display == 0) {
 				return
 			}
 

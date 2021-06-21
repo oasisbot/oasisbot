@@ -61,6 +61,7 @@ export interface Command {
 	Type: number
 	Responses: string[]
 	AssignedRoles: string[]
+	PostReaction?: string | ""
 	AllowedRoles: string[]
 	ForbiddenRoles: string[]
 	ForbiddenChannels: string[]

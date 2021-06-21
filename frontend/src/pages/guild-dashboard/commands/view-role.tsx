@@ -7,6 +7,7 @@ import InputCounter from '../../../components/input/input-counter'
 import CommonSettings from './common-settings'
 import { GuildContext } from '../../guild-dashboard'
 import RoleDisplay from '../../../components/roles/role-display'
+import EmojiDisplay from '../../../components/emoji/emoji-display'
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -65,6 +66,8 @@ export default function CommandViewRole({
 			  ) || []
 			: []
 	)
+	const [reactionEmojis, setReactionEmojis] = React.useState(command.PostReaction ? [command.PostReaction] : ['✅'])
+
 	const [allowedRoles, setAllowedRoles] = React.useState(
 		command.AllowedRoles
 			? guild?.Roles.filter((x) => command.AllowedRoles.includes(x.id)) ||
@@ -121,6 +124,17 @@ export default function CommandViewRole({
 					(x) => !assignedRoles.includes(x)
 				)}
 			/>
+			<h4 style={{ color: '#bbbbbb', marginBottom: '10px' }}>
+				BOT REACTS WITH:
+			</h4>
+			<EmojiDisplay
+				emojis={reactionEmojis}
+				min={1}
+				max={1}
+				onEmojisUpdate={(emojis) => {
+					setReactionEmojis(emojis)
+				}}
+			/>
 			<CommonSettings
 				rolePool={
 					guild?.Roles.filter(
@@ -154,6 +168,7 @@ export default function CommandViewRole({
 								Type: 3,
 								Responses: [''],
 								AssignedRoles: assignedRoles.map((x) => x.id),
+								PostReaction: reactionEmojis.pop() || '',
 								AllowedRoles: allowedRoles.map((x) => x.id),
 								ForbiddenRoles: forbiddenRoles.map((x) => x.id),
 								ForbiddenChannels: forbiddenChannels.map(

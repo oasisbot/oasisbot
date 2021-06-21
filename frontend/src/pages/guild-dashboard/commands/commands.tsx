@@ -148,6 +148,7 @@ export default function Commands() {
 				Type: option || 0,
 				Responses: [''],
 				AssignedRoles: [],
+				PostReaction: '',
 				AllowedRoles: [],
 				ForbiddenRoles: [],
 				ForbiddenChannels: [],

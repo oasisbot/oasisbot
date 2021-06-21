@@ -42,7 +42,8 @@ func RegisterPlugin() {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	logger.Info("Custom commands loaded; total size ", size, " bytes")
+	var sizeMB float32 = float32(size) / 1000000
+	logger.Info("Custom commands loaded; total size ", sizeMB, " MB")
 }
 
 // "guildID": { "commandName": value }

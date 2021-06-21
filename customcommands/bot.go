@@ -90,7 +90,11 @@ func CreateCustomCommandHandler(c *Command) func(s *discordgo.Session, m *discor
 				return
 			}
 			if err == nil {
-				s.MessageReactionAdd(m.ChannelID, m.ID, "✅")
+				reaction := c.PostReaction
+				if reaction == "" {
+					reaction = "✅"
+				}
+				s.MessageReactionAdd(m.ChannelID, m.ID, reaction)
 			}
 		case CommandTypeAdvanced:
 			go HandleAdvancedCommand(s, m, c, args, stripped)
