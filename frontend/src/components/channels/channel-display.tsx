@@ -3,6 +3,7 @@ import { createStyles, IconButton, makeStyles, Theme } from '@material-ui/core'
 
 import HashIcon from '../../assets/channels/hash.svg'
 import AddCircleIcon from '@material-ui/icons/AddCircle'
+import SwapHorizontalCircleIcon from '@material-ui/icons/SwapHorizontalCircle'
 import { Channel } from '../../protocol'
 import ChannelSelect from './channel-select'
 
@@ -47,12 +48,14 @@ export interface ChannelDisplayProps {
 	channels: Channel[]
 	allChannels?: Channel[]
 	onChannelsUpdate?: (channels: Channel[]) => void
+	variant?: 'one'
 }
 
 export default function ChannelDisplay({
 	channels,
 	allChannels = [],
 	onChannelsUpdate,
+	variant,
 }: ChannelDisplayProps) {
 	const classes = useStyles()
 	const [channelSelectOpen, setChannelSelectOpen] = React.useState(false)
@@ -66,13 +69,21 @@ export default function ChannelDisplay({
 
 	const channelAdded = (channel: Channel) => {
 		if (!onChannelsUpdate) return
-		const newChannels = Array.from(channels)
+
+		let newChannels = Array.from(channels)
+		if (variant == 'one') {
+			const channelToRemove = channels.find((x) => true)
+			if (!channelToRemove) return
+			newChannels = Array.from(channels)
+			newChannels.splice(newChannels.indexOf(channel), 1)
+		}
+
 		newChannels.push(channel)
 		onChannelsUpdate(newChannels)
 	}
 
 	const channelRemoved = (channel: Channel) => {
-		if (!onChannelsUpdate) return
+		if (!onChannelsUpdate || variant == 'one') return
 		const newChannels = Array.from(channels)
 		newChannels.splice(newChannels.indexOf(channel), 1)
 		onChannelsUpdate(newChannels)
@@ -93,7 +104,11 @@ export default function ChannelDisplay({
 						size="small"
 						onClick={addClicked}
 					>
-						<AddCircleIcon />
+						{variant !== 'one' ? (
+							<AddCircleIcon />
+						) : (
+							<SwapHorizontalCircleIcon />
+						)}
 					</IconButton>
 				</div>
 			</div>

@@ -64,6 +64,10 @@ export default function TextAreaCounter({
 		if (textAreaProps.onChange) textAreaProps.onChange(value)
 	}
 
+	React.useEffect(() => {
+		handleChange(textAreaProps.value || '')
+	}, [textAreaProps.value])
+
 	return (
 		<div className={classes.parent}>
 			<div className={classes.barContainer}>

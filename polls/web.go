@@ -24,13 +24,10 @@ func (p *Plugin) WebInit() {
 		r.Get("/api/plugins/polls", func(w http.ResponseWriter, r *http.Request) {
 			id := r.Context().Value("guildID")
 			polls := GetAllPollsInGuild(id.(string))
-			newPolls := []FrontendPoll{}
-			for _, poll := range polls {
-				newPolls = append(newPolls, *poll.ToFrontend())
-			}
-
-			fmt.Println(newPolls);
-			json.NewEncoder(w).Encode(newPolls)
+			fmt.Println(len(polls))
+			landing := CreateFrontendLanding(polls)
+			fmt.Println(len(landing.Polls))
+			json.NewEncoder(w).Encode(landing)
 		})
 
 		// New poll
@@ -49,8 +46,12 @@ func (p *Plugin) WebInit() {
 				w.WriteHeader(http.StatusNotAcceptable)
 				return
 			}
-
 			
+			reactions := reactionsToStrings(poll.Reactions)
+			err := NewPoll(id.(string), poll.ChannelID, poll.Content, poll.ReactionMessages, poll.EndsAt, reactions)
+			if err != nil {
+				fmt.Println(err)
+			}
 		})
 	})
 }

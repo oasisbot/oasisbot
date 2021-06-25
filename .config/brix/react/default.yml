@@ -1,0 +1,5 @@
+commands:
+- copy:
+    source: default.tsx.txt
+    destination: ./frontend/src/{module}.tsx
+    overwrite: false

@@ -71,3 +71,46 @@ export interface SettingsReq {
 	BotMasters: string[]
 	Prefix: string
 }
+
+export interface PollLanding {
+	NextPollCycle: number
+	Polls: PollPreview[]
+}
+
+export interface PollPreview {
+	ChannelName: string
+	MessagePreview: string
+	IsFullMessage: boolean
+	Reactions: ReactionData[]
+	EndsAt: number
+}
+
+export interface ReactionData {
+	Emoji: string
+	Users: number | undefined
+}
+
+export interface ReactionMessage {
+	Emoji: string
+	Message: string
+}
+
+export interface Poll {
+	ID: string
+	ChannelID: string
+	Content: string
+	Reactions: ReactionData[]
+	ReactionMessages: ReactionMessage[]
+	EndsAt: any
+}
+
+export interface PollCreate {
+	ChannelID: string
+	Content: string
+	Reactions: ReactionData[]
+	ReactionMessages: ReactionMessage[]
+	EndsAt: number
+}
+
+
+

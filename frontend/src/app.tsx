@@ -10,6 +10,9 @@ import GuildDashboard from './pages/guild-dashboard'
 
 import { User } from './protocol'
 
+import { MuiPickersUtilsProvider } from '@material-ui/pickers'
+import DateFnsUtils from '@date-io/date-fns'
+
 interface UserData {
 	done: boolean
 	user: User | undefined
@@ -57,24 +60,26 @@ function App() {
 				flexFlow: 'column',
 			}}
 		>
-			<Switch>
-				<UserContext.Provider value={{ done: done, user: user }}>
-					<Route exact path="/">
-						<NavigationBar />
-						<Home />
-					</Route>
-					<Route exact path="/login">
-						<Login />
-					</Route>
-					<Route exact path="/dashboard">
-						<NavigationBar />
-						<Dashboard />
-					</Route>
-					<Route path="/d/:id">
-						<GuildDashboard />
-					</Route>
-				</UserContext.Provider>
-			</Switch>
+			<MuiPickersUtilsProvider utils={DateFnsUtils}>
+				<Switch>
+					<UserContext.Provider value={{ done: done, user: user }}>
+						<Route exact path="/">
+							<NavigationBar />
+							<Home />
+						</Route>
+						<Route exact path="/login">
+							<Login />
+						</Route>
+						<Route exact path="/dashboard">
+							<NavigationBar />
+							<Dashboard />
+						</Route>
+						<Route path="/d/:id">
+							<GuildDashboard />
+						</Route>
+					</UserContext.Provider>
+				</Switch>
+			</MuiPickersUtilsProvider>
 		</div>
 	)
 }

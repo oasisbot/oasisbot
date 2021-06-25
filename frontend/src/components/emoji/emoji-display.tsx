@@ -1,7 +1,7 @@
 import React from 'react'
 import { makeStyles, createStyles, Theme, IconButton } from '@material-ui/core'
 import EmojiToken from './emoji-token'
-import EmojiPicker from './emoji-picker'
+import EmojiPicker from './emoji-picker-new'
 
 import AddCircleIcon from '@material-ui/icons/AddCircle'
 

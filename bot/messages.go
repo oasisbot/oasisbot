@@ -1,11 +1,32 @@
 package bot
 
-import "oasisbot/common"
+import (
+	"fmt"
+	"oasisbot/common"
 
-func GetMessageContent(channelID string, messageID string) string {
-	message, err := common.BotSession.State.Message(channelID, messageID)
+	"github.com/bwmarrin/discordgo"
+)
+
+
+func GetMessageEmbedDescription(channelID string, messageID string) string {
+	message, err := common.BotSession.ChannelMessage(channelID, messageID)
 	if err != nil {
+		fmt.Println(err)
 		return "No content"
 	}
-	return message.Content
+	if len(message.Embeds) < 1 {
+		return "No content"
+	}
+	
+	content := message.Embeds[0].Description
+	return content
+}
+
+func GetMessageReactions(channelID string, messageID string) ([]*discordgo.MessageReactions, error) {
+	message, err := common.BotSession.ChannelMessage(channelID, messageID)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	return message.Reactions, nil
 }
