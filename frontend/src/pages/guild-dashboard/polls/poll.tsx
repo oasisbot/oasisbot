@@ -1,11 +1,24 @@
 import React from 'react'
 
-import { makeStyles, createStyles, Theme, IconButton, Divider } from '@material-ui/core'
+import {
+	makeStyles,
+	createStyles,
+	Theme,
+	IconButton,
+	Divider,
+	Dialog,
+	DialogTitle,
+	DialogContent,
+	DialogContentText,
+	DialogActions,
+	Button
+} from '@material-ui/core'
 import AddCircleIcon from '@material-ui/icons/AddCircle'
 import HashIcon from 'src/assets/channels/hash.svg'
 import { ReactionData } from 'src/protocol'
 import { MiniEmojiToken } from 'src/components/emoji/emoji-token'
 import TimerOffIcon from '@material-ui/icons/TimerOff'
+import { GuildContext } from '../../guild-dashboard'
 
 import PollTimer from './poll-timer'
 
@@ -54,37 +67,56 @@ const useStyles = makeStyles((theme: Theme) =>
 		},
 		reactionStrip: {
 			marginTop: 5,
-			width: '100%',
+			width: '180px',
+			overflowX: 'scroll',
 			display: 'flex',
-			flexFlow: 'row',
+			scrollbarColor: '#718096',
+			scrollbarWidth: 'thin',
+			'&::-webkit-scrollbar': {
+				height: '.5rem'
+			},
+			'&::-webkit-scrollbar-thumb': {
+				marginTop: '2px',
+				backgroundColor: '#6d7178ff',
+				borderRadius: '9999px'
+			}
 		},
-        pollTimer: {
-            width: '100%',
-            height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-        }
+		pollTimer: {
+			width: '100%',
+			height: '40px',
+			display: 'flex',
+			alignItems: 'center',
+		},
 	})
 )
 
 export interface PollProps {
 	id: string
-	channelName: string
+	channelID: string
 	messagePreview: string
 	isFullMessage: boolean
 	reactions: ReactionData[]
-	endsAt: number
+	endsAt: number,
+	onEnd: () => void,
 }
 
 export default function Poll({
 	id,
-	channelName,
+	channelID,
 	messagePreview,
 	isFullMessage,
 	reactions,
 	endsAt,
+	onEnd
 }: PollProps) {
 	const classes = useStyles()
+	const guild = React.useContext(GuildContext)
+	const [endDialogueOpen, setEndDialogueOpen] = React.useState(false)
+
+	const handleEndDialogueClose = (yes: boolean = false) => {
+		setEndDialogueOpen(false)
+		if (yes) onEnd()
+	}
 
 	return (
 		<div className={classes.base}>
@@ -99,7 +131,7 @@ export default function Poll({
 						textOverflow: 'ellipsis',
 					}}
 				>
-					{channelName}
+					{guild?.Channels.find(x => x.id == channelID)?.name || ''}
 				</p>
 			</div>
 			<p
@@ -114,15 +146,34 @@ export default function Poll({
 					return <MiniEmojiToken emoji={r.Emoji} users={r.Users} />
 				})}
 			</div>
-            <div className={classes.pollTimer}>
-                <PollTimer timestamp={endsAt}/>
-            </div>
-            <Divider style={{marginTop: 5}}/>
+			<div className={classes.pollTimer}>
+				<PollTimer timestamp={endsAt} />
+			</div>
+			<Divider style={{ marginTop: 5 }} />
 			<div style={{ position: 'absolute', bottom: 10, right: 10 }}>
-				<IconButton size="small">
+				<IconButton size="small" onClick={() => setEndDialogueOpen(true)}>
 					<TimerOffIcon />
 				</IconButton>
 			</div>
+			<Dialog
+				open={endDialogueOpen}
+				onClose={() => handleEndDialogueClose()}
+			>
+				<DialogTitle>End this poll early?</DialogTitle>
+				<DialogContent>
+					<DialogContentText>
+						{`Your poll will be ended early. This action cannot be undone.`}
+					</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => handleEndDialogueClose()}>
+						Cancel
+					</Button>
+					<Button onClick={() => handleEndDialogueClose(true)}>
+						Yes
+					</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	)
 }

@@ -78,7 +78,8 @@ export interface PollLanding {
 }
 
 export interface PollPreview {
-	ChannelName: string
+	ID: string
+	ChannelID: string
 	MessagePreview: string
 	IsFullMessage: boolean
 	Reactions: ReactionData[]

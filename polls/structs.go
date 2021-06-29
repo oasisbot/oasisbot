@@ -4,6 +4,7 @@ type Poll struct {
 	GuildID          string            `bson:"guild_id"`
 	ChannelID        string            `bson:"channel_id"`
 	MessageID        string            `bson:"message_id"`
+	Content          string            `bson:"content"`
 	ReactionMessages []ReactionMessage `bson:"reaction_messages"`
 	EndsAt           int64             `bson:"ends_at"`
 }
@@ -24,7 +25,8 @@ type ReactionMessage struct {
 }
 
 type FrontendPollPreview struct {
-	ChannelName string
+	ID        string
+	ChannelID string
 	// First 100 characters of the message or less
 	MessagePreview string
 	// Whether or not the message fits in 100 chars

@@ -14,9 +14,9 @@ func (p *Plugin) WebInit() {
 	r := common.Mux
 
 	r.Group(func(r chi.Router) {
-		r.Use(web.SessionMiddleware);
-		r.Use(web.QueryPermissionMiddleware);
-		r.Use(web.JSONMiddleware);
+		r.Use(web.SessionMiddleware)
+		r.Use(web.QueryPermissionMiddleware)
+		r.Use(web.JSONMiddleware)
 
 		r.Get("/api/plugins/commands", func(w http.ResponseWriter, r *http.Request) {
 			id := r.Context().Value("guildID")

@@ -10,6 +10,7 @@ import TextAreaCounter from 'src/components/input/text-area-counter'
 import EmojiDisplay from 'src/components/emoji/emoji-display'
 import { SelectEmojiToken } from 'src/components/emoji/emoji-token'
 import Info from 'src/components/labels/info'
+import SaveInner from 'src/components/misc/save-inner'
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -175,35 +176,26 @@ export default function PollView({
 				minDate={new Date()}
 				maxDate={addMonths(new Date(), 6)}
 			/>
-			<div className={classes.saveArea}>
-				<div className={classes.save}>
-					<Button
-						color="inherit"
-						style={{ backgroundColor: '#43b581ff' }}
-						variant="contained"
-						onClick={() => {
-							const p: PollCreate = {
-								ChannelID: channel?.id || '',
-								Content: pollContent,
-								Reactions: pollReactions.map((x) => {
-									return {
-										Emoji: x,
-										Users: undefined,
-									}
-								}),
-								ReactionMessages: reactionMessages,
-								EndsAt: Math.floor(pollEndTime.getTime() / 1000)
+			<SaveInner
+				saveText='Create Poll'
+				variant='full-save'
+				onSave={() => {
+					const p: PollCreate = {
+						ChannelID: channel?.id || '',
+						Content: pollContent,
+						Reactions: pollReactions.map((x) => {
+							return {
+								Emoji: x,
+								Users: undefined,
 							}
-							onSave(p)
-						}}
-					>
-						Create Poll
-					</Button>
-					<Button style={{ marginRight: '10px' }} onClick={onClose}>
-						Cancel
-					</Button>
-				</div>
-			</div>
+						}),
+						ReactionMessages: reactionMessages,
+						EndsAt: Math.floor(pollEndTime.getTime() / 1000)
+					}
+					onSave(p)
+				}}
+				onCancel={onClose}
+			/>
 		</div>
 	)
 }

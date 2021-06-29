@@ -2,7 +2,6 @@ package polls
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"oasisbot/common"
@@ -11,9 +10,8 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-
 func (p *Plugin) WebInit() {
-	r := common.Mux;
+	r := common.Mux
 
 	r.Group(func(r chi.Router) {
 		r.Use(web.SessionMiddleware)
@@ -24,9 +22,7 @@ func (p *Plugin) WebInit() {
 		r.Get("/api/plugins/polls", func(w http.ResponseWriter, r *http.Request) {
 			id := r.Context().Value("guildID")
 			polls := GetAllPollsInGuild(id.(string))
-			fmt.Println(len(polls))
 			landing := CreateFrontendLanding(polls)
-			fmt.Println(len(landing.Polls))
 			json.NewEncoder(w).Encode(landing)
 		})
 
@@ -46,12 +42,35 @@ func (p *Plugin) WebInit() {
 				w.WriteHeader(http.StatusNotAcceptable)
 				return
 			}
-			
+
 			reactions := reactionsToStrings(poll.Reactions)
 			err := NewPoll(id.(string), poll.ChannelID, poll.Content, poll.ReactionMessages, poll.EndsAt, reactions)
 			if err != nil {
-				fmt.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
 			}
+
+			polls := GetAllPollsInGuild(id.(string))
+			landing := CreateFrontendLanding(polls)
+			json.NewEncoder(w).Encode(landing)
+		})
+
+		// End poll
+		r.Delete("/api/plugins/polls/{pollID}", func(w http.ResponseWriter, r *http.Request) {
+			id := r.Context().Value("guildID").(string)
+			pollID := chi.URLParam(r, "pollID")
+
+			poll := getPoll(id, pollID)
+			if poll == nil {
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+
+			endPoll(poll)
+
+			polls := GetAllPollsInGuild(id)
+			landing := CreateFrontendLanding(polls)
+			json.NewEncoder(w).Encode(landing)
 		})
 	})
 }

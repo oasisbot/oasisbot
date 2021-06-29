@@ -18,7 +18,7 @@ const (
 
 	COL_GUILDS   = "guilds"
 	COL_COMMANDS = "commands"
-	COL_POLLS = "polls"
+	COL_POLLS    = "polls"
 )
 
 func Connect(ctx context.Context) *mongo.Client {

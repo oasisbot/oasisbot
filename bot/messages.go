@@ -7,7 +7,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-
 func GetMessageEmbedDescription(channelID string, messageID string) string {
 	message, err := common.BotSession.ChannelMessage(channelID, messageID)
 	if err != nil {
@@ -17,7 +16,7 @@ func GetMessageEmbedDescription(channelID string, messageID string) string {
 	if len(message.Embeds) < 1 {
 		return "No content"
 	}
-	
+
 	content := message.Embeds[0].Description
 	return content
 }

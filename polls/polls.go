@@ -1,12 +1,14 @@
 package polls
 
 import (
+	"errors"
 	"oasisbot/bot"
 	"oasisbot/common"
 	"time"
 
 	"oasisbot/logs"
 
+	"github.com/bwmarrin/discordgo"
 	"github.com/carlescere/scheduler"
 	emoji "github.com/tmdvs/Go-Emoji-Utils"
 )
@@ -20,10 +22,10 @@ func (p *Plugin) GetName() string {
 }
 
 var (
-	cache map[string]map[string]*Poll
-	interval int
-	pollLimit int
-	logger = logs.PluginLogger(&Plugin{})
+	cache              map[string]map[string]*Poll
+	interval           int
+	pollLimit          int
+	logger             = logs.PluginLogger(&Plugin{})
 	lastCycleTimestamp int64
 )
 
@@ -36,9 +38,15 @@ func RegisterPlugin() {
 		logger.Fatalln(err)
 	}
 	cache = make(map[string]map[string]*Poll)
+
+	logger.Info("Loading polls...")
+	start := time.Now()
 	for _, poll := range polls {
 		addPollToCache(poll)
+		go updateReactionCache(poll)
 	}
+	elapsed := time.Now().Sub(start)
+	logger.Infoln("Finished loading and indexing all polls in", elapsed.Milliseconds(), "ms")
 
 	pollLimit = common.ConfPluginPollsGuildPollLimit.GetInt()
 	interval = common.ConfPluginPollsInterval.GetInt()
@@ -58,11 +66,9 @@ func runLoop() {
 			for _, poll := range guild {
 				now := time.Now().UTC().Unix()
 				if now > poll.EndsAt {
-					err := deletePoll(poll.MessageID)
-					if err == nil {
-						deletePollFromCache(poll)
-						endPoll(poll.ChannelID, poll.MessageID)
-					}
+					endPoll(poll)
+				} else {
+					go updateReactionCache(poll)
 				}
 			}
 		}
@@ -82,18 +88,19 @@ func NewPoll(guildID string, channelID string, content string, reactionMessages 
 			return
 		}
 		poll := &Poll{
-			GuildID: guildID,
-			ChannelID: channelID,
-			MessageID: msgID,
+			GuildID:          guildID,
+			ChannelID:        channelID,
+			MessageID:        msgID,
+			Content:          content,
 			ReactionMessages: reactionMessages,
-			EndsAt: endTimestamp,
+			EndsAt:           endTimestamp,
 		}
 		if err := addPoll(poll); err == nil {
 			addPollToCache(poll)
 		}
 		result <- nil
 	}()
-	return <- result
+	return <-result
 }
 
 func ValidPoll(guildID string, poll *PollCreate) bool {
@@ -130,6 +137,21 @@ func ValidPoll(guildID string, poll *PollCreate) bool {
 	return true
 }
 
+func getPoll(guildID string, pollID string) *Poll {
+	if cache[guildID] == nil {
+		return nil
+	}
+	return cache[guildID][pollID]
+}
+
+func endPoll(poll *Poll) {
+	err := deletePoll(poll.MessageID)
+	if err == nil {
+		deletePollFromCache(poll)
+		endPollImpl(poll)
+	}
+}
+
 // CACHE OPERATIONS
 
 func addPollToCache(poll *Poll) {
@@ -157,7 +179,7 @@ func GetAllPollsInGuild(guildID string) map[string]*Poll {
 	return cache[guildID]
 }
 
-func CanCreatePoll(guildID string) bool { 
+func CanCreatePoll(guildID string) bool {
 	polls := cache[guildID]
 	if len(polls) < pollLimit {
 		return true
@@ -169,7 +191,27 @@ func NextCycleTimestamp() int64 {
 	return lastCycleTimestamp + int64(interval)
 }
 
+func filterByAllowedReactions(rawReactions []*discordgo.MessageReactions, messages []ReactionMessage) []*discordgo.MessageReactions {
+	var finalReactions []*discordgo.MessageReactions
+	for _, raw := range rawReactions {
+		if containsReactionMessages(messages, raw.Emoji.Name) {
+			finalReactions = append(finalReactions, raw)
+		}
+	}
+	return finalReactions
+}
+
 func containsReaction(reactions []ReactionData, emoji string) bool {
+	for _, r := range reactions {
+		if r.Emoji == emoji {
+			return true
+		}
+	}
+
+	return false
+}
+
+func containsReactionMessages(reactions []ReactionMessage, emoji string) bool {
 	for _, r := range reactions {
 		if r.Emoji == emoji {
 			return true
@@ -191,12 +233,35 @@ func containsString(strings []string, s string) bool {
 
 func duplicateReactions(reactions []ReactionData) bool {
 	visited := make(map[ReactionData]bool, 0)
-   	for _, reaction := range reactions {
-      	if visited[reaction] == true{
-         	return true
-      	} else {
-         	visited[reaction] = true
-      	}
-   	}
-   	return false
+	for _, reaction := range reactions {
+		if visited[reaction] == true {
+			return true
+		} else {
+			visited[reaction] = true
+		}
+	}
+	return false
+}
+
+func multipleOccurrences(reactions []ReactionData, test int) bool {
+	found := false
+	for _, r := range reactions {
+		if r.Users == test {
+			if found {
+				return true
+			}
+			found = true
+		}
+	}
+	return false
+}
+
+func findReactionMessage(reaction string, reactions []ReactionMessage) (string, error) {
+	for _, reactionSearch := range reactions {
+		if reactionSearch.Emoji == reaction {
+			return reactionSearch.Message, nil
+		}
+	}
+
+	return "", errors.New("No match")
 }

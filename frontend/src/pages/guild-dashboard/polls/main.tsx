@@ -71,16 +71,16 @@ export default function Main({
 			</div>
 			<Divider style={{ marginTop: '20px', marginBottom: '10px' }} />
 			<div className={classes.pollContainer}>
-				{polls.map((poll) => {
-					console.log(poll)
+				{polls.sort((a, b) => a.EndsAt - b.EndsAt).map((poll) => {
 					return (
 						<UIPoll
-							id=""
-							channelName={poll.ChannelName}
+							id={poll.ID}
+							channelID={poll.ChannelID}
 							messagePreview={poll.MessagePreview}
 							isFullMessage={poll.IsFullMessage}
 							reactions={poll.Reactions}
 							endsAt={poll.EndsAt}
+							onEnd={() => onPollEnd(poll)}
 						/>
 					)
 				})}
@@ -90,8 +90,7 @@ export default function Main({
 						onSelect={() => onPollSelect(undefined)}
 					/>
 				) : undefined}
-				{
-				polls.length == 0 ? (
+				{polls.length == 0 ? (
 					<>
 						<EmptyPoll />
 						<EmptyPoll />

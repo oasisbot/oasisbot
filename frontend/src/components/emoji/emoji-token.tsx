@@ -39,6 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
 			height: 23,
 		},
 		miniToken: {
+			flexShrink: 0,
 			minWidth: 30,
 			height: 30,
 			borderRadius: 7,
@@ -53,7 +54,7 @@ const useStyles = makeStyles((theme: Theme) =>
 			},
 		},
 		miniEmojiContainer: {
-			width: 17,
+			minWidth: '17px',
 			height: 17,
 			marginLeft: '7px',
 			marginRight: '7px',

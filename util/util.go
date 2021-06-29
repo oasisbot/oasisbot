@@ -24,9 +24,9 @@ func UnorderedEqual(first, second []string) bool {
 
 // https://stackoverflow.com/a/60508928
 func GetRealSizeOf(v interface{}) (int, error) {
-    b := new(bytes.Buffer)
-    if err := json.NewEncoder(b).Encode(v); err != nil {
-        return 0, err
-    }
-    return b.Len(), nil
+	b := new(bytes.Buffer)
+	if err := json.NewEncoder(b).Encode(v); err != nil {
+		return 0, err
+	}
+	return b.Len(), nil
 }

@@ -17,7 +17,7 @@ var (
 	ConfDomain            *config.Option
 	ConfDeveloperServerID *config.Option
 
-	ConfPluginPollsInterval *config.Option
+	ConfPluginPollsInterval       *config.Option
 	ConfPluginPollsGuildPollLimit *config.Option
 )
 
@@ -34,7 +34,7 @@ func RegisterOptions() {
 	ConfDeveloperServerID = config.RegisterOption("oasisbot.developer_server_id", "The ID for the main developer server", "")
 
 	ConfPluginPollsInterval = config.RegisterOption("oasisbot.plugins.polls.interval", "The interval, in seconds, at which the polls plugin will check for updates", 60)
-	ConfPluginPollsGuildPollLimit = config.RegisterOption("oasisbot.plugins.polls.guild.poll.limit", "The max amount of ongoing polls in a guild", 5);
+	ConfPluginPollsGuildPollLimit = config.RegisterOption("oasisbot.plugins.polls.guild.poll.limit", "The max amount of ongoing polls in a guild", 5)
 }
 
 func LoadConfig() error {

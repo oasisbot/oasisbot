@@ -55,11 +55,15 @@ const useStyles = makeStyles((theme: Theme) =>
 	})
 )
 
-export default function Dots() {
+export interface DotsProps {
+	style?: React.CSSProperties
+}
+
+export default function Dots({ style }: DotsProps) {
 	const classes = useStyles()
 	return (
-		<div className={classes.stage}>
-			<div className={classes.dots} />
+		<div className={classes.stage} style={style}>
+			<div className={classes.dots}/>
 		</div>
 	)
 }

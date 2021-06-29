@@ -75,6 +75,19 @@ export default function Polls() {
 		}
 	}
 
+	const onEnd = (p: PollPreview) => {
+		if (!landing) return
+		var xhr = new XMLHttpRequest()
+		xhr.open('DELETE', `/api/plugins/polls/${p.ID}?id=${guild.ID}`)
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				var json = JSON.parse(xhr.responseText) as PollLanding
+				setLanding(json)
+			}
+		}
+		xhr.send()
+	}
+
 	const onClose = () => {
 		setCurrentEdit(undefined)
 		setCurrentPoll(undefined)
@@ -87,7 +100,7 @@ export default function Polls() {
 					polls={landing.Polls || []}
 					nextCycleTimestamp={landing.NextPollCycle}
 					onPollSelect={onPollSelect}
-					onPollEnd={() => {}}
+					onPollEnd={onEnd}
 				/>
 			) : currentPoll ? (
 				<PollView

@@ -3,6 +3,9 @@ package polls
 import (
 	"fmt"
 	"oasisbot/common"
+	colors "oasisbot/common/colors"
+	"oasisbot/common/templates"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -10,7 +13,7 @@ import (
 func sendPollMessage(channelID string, content string, reactions []string) (string, error) {
 	msgSend := &discordgo.MessageSend{
 		Embed: &discordgo.MessageEmbed{
-			Title: "Poll",
+			Title:       "Poll",
 			Description: content,
 		},
 	}
@@ -24,8 +27,8 @@ func sendPollMessage(channelID string, content string, reactions []string) (stri
 	return "", err
 }
 
-func endPoll(channelID string, messageID string) {
-	message, err := common.BotSession.ChannelMessage(channelID, messageID)
+func endPollImpl(poll *Poll) {
+	message, err := common.BotSession.ChannelMessage(poll.ChannelID, poll.MessageID)
 	if err != nil {
 		return
 	}
@@ -34,38 +37,89 @@ func endPoll(channelID string, messageID string) {
 	}
 	embed := message.Embeds[0]
 	msgEdit := &discordgo.MessageEdit{
-		Channel: channelID,
-		ID: messageID,
+		Channel: poll.ChannelID,
+		ID:      poll.MessageID,
 		Embed: &discordgo.MessageEmbed{
-			Title: embed.Title + " [ENDED]",
+			Title:       embed.Title + " [ENDED]",
 			Description: embed.Description,
+			Color:       colors.RED,
 		},
 	}
 	common.BotSession.ChannelMessageEditComplex(msgEdit)
 
+	filteredReactions := filterByAllowedReactions(message.Reactions, poll.ReactionMessages)
 	tally := make(map[string]int)
-	for _, reaction := range message.Reactions {
-		if _, ok := tally[reaction.Emoji.ID]; ok {
-			tally[reaction.Emoji.Name]++
+	for _, reaction := range filteredReactions {
+		tally[reaction.Emoji.Name] = reaction.Count - 1
+	}
+
+	var reactions []ReactionData
+	var tie bool
+
+	for key, value := range tally {
+		reactions = append(reactions, ReactionData{Emoji: key, Users: value})
+	}
+
+	best := reactions[0]
+	for _, reaction := range reactions {
+		if reaction.Users > best.Users {
+			best = reaction
+		}
+	}
+	if multipleOccurrences(reactions, best.Users) {
+		tie = true
+	}
+
+	response, _ := findReactionMessage(best.Emoji, poll.ReactionMessages)
+	if tie || strings.TrimSpace(response) == "" {
+		var resultsString string
+		for name, count := range tally {
+			text := "members"
+			if count == 1 {
+				text = "member"
+			}
+			resultsString += fmt.Sprintf("%s ➜ **%v** %s\n", name, count, text)
+		}
+
+		var previewString string
+		if len(embed.Description) > 100 {
+			previewString += embed.Description[0:101]
+			previewString += "..."
 		} else {
-			tally[reaction.Emoji.Name] = 1
+			previewString += embed.Description
 		}
-	}
 
-	var formatted string
-	for name, count := range tally {
-		text := "members"
-		if count == 1 {
-			text = "member"
+		formatted := fmt.Sprintf("*%s*\n\nResults:\n%s", previewString, resultsString)
+
+		msgSend := &discordgo.MessageSend{
+			Embed: &discordgo.MessageEmbed{
+				Title:       "Poll Results",
+				Description: formatted,
+			},
 		}
-		formatted += fmt.Sprintf("%s **%v %s**\n", name, count, text)
-	}
+		common.BotSession.ChannelMessageSendComplex(poll.ChannelID, msgSend)
+	} else {
+		var final string
+		if err != nil {
+			final = response
+			goto Send
+		}
+		{
+			var context = make(map[string]interface{})
+			for name, count := range tally {
+				context[name] = count
+			}
+			final = templates.ParseAndExecuteSimple(response, "[", "]", context)
+		}
 
-	msgSend := &discordgo.MessageSend{
-		Embed: &discordgo.MessageEmbed{
-			Title: "Results",
-			Description: formatted,
-		},
+	Send:
+
+		msgSend := &discordgo.MessageSend{
+			Embed: &discordgo.MessageEmbed{
+				Title:       "Poll Results",
+				Description: final,
+			},
+		}
+		common.BotSession.ChannelMessageSendComplex(poll.ChannelID, msgSend)
 	}
-	common.BotSession.ChannelMessageSendComplex(channelID, msgSend)
 }
