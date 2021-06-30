@@ -19,20 +19,20 @@ var (
 	EndpointDiscordAPIUsersMe       = AppendToDiscordAPI("/users/@me")
 	EndpointDiscordAPIUsersMeGuilds = AppendToDiscordAPI("/users/@me/guilds")
 	EndpointDiscordAPIGuild         = AppendToDiscordAPI("/guilds")
-
-	// OasisBot
-
-	EndpointDashboardBase = AppendToDomain("/d/")
 )
 
 var (
 	EndpointAuthCallback string
 	EndpointGuildOauth   string
+
+	EndpointDashboardBase string
 )
 
 func SetupEndpoints() {
 	EndpointAuthCallback = AppendToDomain("/auth/callback")
 	EndpointGuildOauth = AppendToDomain("/guild-oauth")
+
+	EndpointDashboardBase = AppendToDomain("/d/")
 }
 
 func AppendToDiscord(path string) string {
