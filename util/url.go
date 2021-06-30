@@ -1,13 +1,14 @@
 package util
 
-import "fmt"
-
-const DomainURL = "localhost:3000"
+import (
+	"fmt"
+	"oasisbot/common/endpoints"
+)
 
 func DashboardURL(guildID string) string {
-	return fmt.Sprintf("http://%s/d/%s", DomainURL, guildID)
+	return fmt.Sprintf("%s%s", endpoints.EndpointDashboardBase, guildID)
 }
 
 func URLToPlugin(guildID string, trail string) string {
-	return fmt.Sprintf("http://%s/d/%s/%s", DomainURL, guildID, trail)
+	return fmt.Sprintf("%s%s/%s", endpoints.EndpointDashboardBase, guildID, trail)
 }

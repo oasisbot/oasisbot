@@ -6,6 +6,8 @@ import (
 )
 
 var (
+	// Discord
+
 	APIVersion         = "v8"
 	EndpointDiscord    = "https://discord.com"
 	EndpointDiscordAPI = AppendToDiscord(fmt.Sprintf("/api/%s", APIVersion))
@@ -17,6 +19,10 @@ var (
 	EndpointDiscordAPIUsersMe       = AppendToDiscordAPI("/users/@me")
 	EndpointDiscordAPIUsersMeGuilds = AppendToDiscordAPI("/users/@me/guilds")
 	EndpointDiscordAPIGuild         = AppendToDiscordAPI("/guilds")
+
+	// OasisBot
+
+	EndpointDashboardBase = AppendToDomain("/d/")
 )
 
 var (
