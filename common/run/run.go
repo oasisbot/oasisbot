@@ -1,6 +1,7 @@
 package run
 
 import (
+	"fmt"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -64,5 +65,10 @@ func Init() {
 
 func Run() {
 	bot.Run()
+
+	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
+	if port == ":" {
+		port = args.Addr
+	}
 	web.Run(args.Addr)
 }
