@@ -8,13 +8,12 @@ import {
 	List,
 	ListItem,
 	ListItemText,
-	Divider,
-	ListSubheader,
 } from '@material-ui/core'
 import UserDropdown from './user-dropdown'
 
 import { useHistory } from 'react-router'
 import { UserContext } from '../../app'
+import { login } from 'src/lib/login'
 
 import MenuIcon from '@material-ui/icons/Menu'
 
@@ -155,9 +154,9 @@ export default function NavigationBar() {
 						</li>
 					</ul>
 				</nav>
-				{loading ? (
+				{loading ?
 					<></>
-				) : user ? (
+				: user ? (
 					<UserDropdown user={user} />
 				) : (
 					<Button
@@ -206,11 +205,5 @@ export default function NavigationBar() {
 			</Drawer>
 			<React.Fragment />
 		</div>
-	)
-}
-
-const login = () => {
-	window.open(
-		'https://discord.com/api/oauth2/authorize?client_id=749649771639341207&redirect_uri=https%3A%2F%2Foasisbot-main.herokuapp.com%2Fauth%2Fcallback&response_type=code&scope=identify%20email%20guilds'
 	)
 }

@@ -1,6 +1,8 @@
 import React from 'react'
 import { Button, Divider } from '@material-ui/core'
 
+import { login } from 'src/lib/login'
+
 export default function Login() {
 	React.useEffect(() => {
 		const fetchData = async () => {
@@ -25,7 +27,7 @@ export default function Login() {
 		>
 			<h1>Welcome to OasisBot.xyz!</h1>
 			<p>Login to continue</p>
-			<Button variant="contained" size="large" color="primary">
+			<Button variant="contained" size="large" color="primary" onClick={() => login()}>
 				Login with Discord
 			</Button>
 			<Divider

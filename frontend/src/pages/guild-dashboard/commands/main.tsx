@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export interface MainProps {
 	commands: Command[]
 	prefix: string
-	onCommandToggle: (command: Command, enabled: boolean) => void
+	onCommandUpdate: (command: Command) => void
 	onCommandDelete: (command: Command) => void
 	onCommandSelect: (command: Command | undefined, option?: number) => void
 }
@@ -80,7 +80,7 @@ export interface MainProps {
 export default function Main({
 	commands,
 	prefix,
-	onCommandToggle,
+	onCommandUpdate,
 	onCommandDelete,
 	onCommandSelect,
 }: MainProps) {
@@ -164,7 +164,7 @@ export default function Main({
 					</h2>
 				</div>
 				{commands.length > 0 ? (
-					commands.map((c) => {
+					commands.sort((a, b) => a.Name.localeCompare(b.Name)).map((c) => {
 						return (
 							<UICommand
 								key={c.Name}
@@ -172,9 +172,10 @@ export default function Main({
 								description={c.Description}
 								enabled={c.Enabled}
 								prefix={prefix}
-								onEnableChange={(enabled: boolean) =>
-									onCommandToggle(c, enabled)
-								}
+								onEnableChange={(enabled: boolean) => {
+									c.Enabled = enabled
+									onCommandUpdate(c)
+								}}
 								onSelect={() => onCommandSelect(c)}
 								onDelete={() => onCommandDelete(c)}
 							/>

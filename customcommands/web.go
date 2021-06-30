@@ -42,13 +42,13 @@ func (p *Plugin) WebInit() {
 			}
 
 			if err := AddCommand(id.(string), &command); err == nil {
-				json.NewEncoder(w).Encode(command)
+				w.WriteHeader(http.StatusCreated)
 			} else {
 				w.WriteHeader(http.StatusBadRequest)
 			}
 		})
 
-		r.Patch("/api/plugins/commands/{commandName}", func(w http.ResponseWriter, r *http.Request) {
+		r.Put("/api/plugins/commands/{commandName}", func(w http.ResponseWriter, r *http.Request) {
 			id := r.Context().Value("guildID")
 			commandName := chi.URLParam(r, "commandName")
 
@@ -62,7 +62,7 @@ func (p *Plugin) WebInit() {
 			}
 
 			if err := UpdateCommand(id.(string), commandName, &command); err == nil {
-				json.NewEncoder(w).Encode(command)
+				w.WriteHeader(http.StatusAccepted)
 			} else {
 				w.WriteHeader(http.StatusBadRequest)
 				return
@@ -74,7 +74,7 @@ func (p *Plugin) WebInit() {
 			commandName := chi.URLParam(r, "commandName")
 
 			if err := DeleteCommand(id.(string), commandName); err != nil {
-				w.WriteHeader(http.StatusBadRequest)
+				w.WriteHeader(http.StatusNotFound)
 			} else {
 				w.WriteHeader(http.StatusOK)
 			}

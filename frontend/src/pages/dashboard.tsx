@@ -1,16 +1,7 @@
 import React from 'react'
 import Skeleton from '@material-ui/lab/Skeleton'
-import {
-	makeStyles,
-	createStyles,
-	Theme,
-	Paper,
-	Avatar,
-	Button,
-	Card,
-	CardContent,
-	Typography,
-} from '@material-ui/core'
+import { makeStyles, createStyles, Theme, Button } from '@material-ui/core'
+import { useQuery } from 'react-query'
 
 import { GuildPreview } from '../protocol'
 import { useHistory } from 'react-router-dom'
@@ -77,28 +68,10 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Dashboard() {
 	let history = useHistory()
 	const classes = useStyles()
-	const [guilds, setGuilds] = React.useState<undefined | GuildPreview[]>()
 
-	React.useEffect(() => {
-		const doFetch = async () => {
-			const result = await fetch('/api/users/@me/guilds')
-			if (result.status === 401) {
-				window.location.href = '/login'
-			}
-
-			const data = await result.body?.getReader().read()
-			if (!data) return
-			let unsorted = JSON.parse(
-				new TextDecoder().decode(data.value)
-			) as GuildPreview[]
-			setGuilds(
-				unsorted.sort(function (x, y) {
-					return (y.HasBot ? 1 : 0) - (x.HasBot ? 1 : 0)
-				})
-			)
-		}
-		doFetch()
-	}, [])
+	const { data: guilds, isLoading } = useQuery('dashboard', async () => {
+		return await fetch('/api/users/@me/guilds').then((g) => g.json())
+	})
 
 	return (
 		<div
@@ -122,7 +95,7 @@ export default function Dashboard() {
 				<h1 style={{ color: '#dddddd' }}>SELECT A SERVER</h1>
 			</div>
 			<div className={classes.guildContainer}>
-				{!guilds ? (
+				{isLoading || !guilds ? (
 					<>
 						<div className={classes.cardSkeleton}>
 							<Skeleton
@@ -228,57 +201,62 @@ export default function Dashboard() {
 						</div>
 					</>
 				) : (
-					guilds.map((guild) => {
-						return (
-							<div className={classes.card}>
-								<GuildIcon
-									className={classes.cardAvatar}
-									guild={guild}
-									style={{
-										margin: '0 auto',
-										marginTop: '20px',
-										width: '50px',
-										height: '50px',
-									}}
-								/>
-								<h3 style={{ fontWeight: 'normal' }}>
-									{guild.Name}
-								</h3>
-								{guild.HasBot ? (
-									<Button
-										variant="contained"
-										color="primary"
-										onClick={() =>
-											history.push(`../d/${guild.ID}`)
-										}
-										style={{
-											position: 'absolute',
-											bottom: '20px',
-										}}
-									>
-										Go to dashboard
-									</Button>
-								) : (
-									<Button
-										variant="contained"
-										color="inherit"
-										onClick={() =>
-											window.open(
-												`https://discord.com/oauth2/authorize?client_id=749649771639341207&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fguild-oauth&response_type=code&guild_id=${guild.ID}&scope=bot&permissions=8`
-											)
-										}
-										style={{
-											position: 'absolute',
-											bottom: '20px',
-											backgroundColor: '#525252',
-										}}
-									>
-										Set up Oasis Bot
-									</Button>
-								)}
-							</div>
+					guilds
+						.sort(
+							(a: any, b: any) =>
+								(b.HasBot ? 1 : 0) - (a.HasBot ? 1 : 0)
 						)
-					})
+						.map((guild: GuildPreview) => {
+							return (
+								<div className={classes.card}>
+									<GuildIcon
+										className={classes.cardAvatar}
+										guild={guild}
+										style={{
+											margin: '0 auto',
+											marginTop: '20px',
+											width: '50px',
+											height: '50px',
+										}}
+									/>
+									<h3 style={{ fontWeight: 'normal' }}>
+										{guild.Name}
+									</h3>
+									{guild.HasBot ? (
+										<Button
+											variant="contained"
+											color="primary"
+											onClick={() =>
+												history.push(`../d/${guild.ID}`)
+											}
+											style={{
+												position: 'absolute',
+												bottom: '20px',
+											}}
+										>
+											Go to dashboard
+										</Button>
+									) : (
+										<Button
+											variant="contained"
+											color="inherit"
+											onClick={() =>
+												window.open(
+													`https://discord.com/oauth2/authorize?client_id=749649771639341207&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fguild-oauth&response_type=code&guild_id=${guild.ID}&scope=bot&permissions=8`
+												)
+											}
+											style={{
+												position: 'absolute',
+												bottom: '20px',
+												backgroundColor: '#525252',
+											}}
+										>
+											Set up OasisBot
+										</Button>
+									)}
+								</div>
+							)
+						})
 				)}
 				<div style={{ height: '50px' }} />
 			</div>

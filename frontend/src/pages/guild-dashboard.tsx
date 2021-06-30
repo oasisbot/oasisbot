@@ -1,6 +1,11 @@
 import React from 'react'
 import { makeStyles, createStyles, Theme } from '@material-ui/core'
-import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
+import {
+	Redirect,
+	Route,
+	Switch,
+	withRouter,
+} from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import axios from 'axios'
 
@@ -58,14 +63,11 @@ export function GuildDashboard() {
 		{ retry: false }
 	)
 
-	const settingsMutation = useMutation(
-		(settings: SettingsReq) =>
-			axios.patch(`/api/dashboard/settings?id=${data.ID}`, settings),
-		{
-			onSuccess: (data) => {
-				queryClient.setQueryData('guild-dashboard', data.data)
-			},
-		}
+	const settingsMutation = useMutation((settings: SettingsReq) =>
+		axios.patch(`/api/dashboard/settings?id=${data.ID}`, settings),
+		{onSuccess: data => {
+			queryClient.setQueryData('guild-dashboard', data.data)
+		}}
 	)
 
 	const classes = useStyles()
@@ -84,10 +86,7 @@ export function GuildDashboard() {
 							<Home guild={data} />
 						</Route>
 						<Route exact path="/d/:id/settings">
-							<Settings
-								guild={data}
-								onSave={settingsMutation.mutate}
-							/>
+							<Settings guild={data} onSave={settingsMutation.mutate} />
 						</Route>
 						<Route exact path="/d/:id/commands">
 							<PageHeader index={0} />
