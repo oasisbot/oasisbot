@@ -108,7 +108,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function NavigationBar() {
 	const history = useHistory()
 	const classes = useStyles()
-	const { done, user } = React.useContext(UserContext)
+	const { user, loading } = React.useContext(UserContext)
 	const [drawerOpen, setDrawerOpen] = React.useState(false)
 
 	return (
@@ -155,7 +155,7 @@ export default function NavigationBar() {
 						</li>
 					</ul>
 				</nav>
-				{!done ? (
+				{loading ? (
 					<></>
 				) : user ? (
 					<UserDropdown user={user} />

@@ -8,6 +8,7 @@ import ReactDOM from 'react-dom'
 import App from './app'
 
 import { BrowserRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 import {
 	createMuiTheme,
@@ -15,6 +16,8 @@ import {
 	responsiveFontSizes,
 	CssBaseline,
 } from '@material-ui/core'
+
+const queryClient = new QueryClient()
 
 const useTheme = () => {
 	return responsiveFontSizes(
@@ -36,12 +39,14 @@ const Root = () => {
 	const theme = useTheme()
 	return (
 		<React.StrictMode>
-			<BrowserRouter>
-				<ThemeProvider theme={theme}>
-					<CssBaseline />
-					<App />
-				</ThemeProvider>
-			</BrowserRouter>
+			<QueryClientProvider client={queryClient}>
+				<BrowserRouter>
+					<ThemeProvider theme={theme}>
+						<CssBaseline />
+						<App />
+					</ThemeProvider>
+				</BrowserRouter>
+			</QueryClientProvider>
 		</React.StrictMode>
 	)
 }

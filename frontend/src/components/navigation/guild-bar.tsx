@@ -125,7 +125,7 @@ export interface GuildBarProps {
 
 export default function GuildBar(props: GuildBarProps) {
 	const history = useHistory()
-	const { done, user } = React.useContext(UserContext)
+	const { user } = React.useContext(UserContext)
 	const classes = useStyles()
 
 	const [guildDropdownOpen, setGuildDropdownOpen] = React.useState(false)
@@ -167,10 +167,6 @@ export default function GuildBar(props: GuildBarProps) {
 				break
 		}
 	}, [])
-
-	React.useEffect(() => {
-		if (done && !user) history.push('/login')
-	}, [done])
 
 	return (
 		<div className={classes.root}>

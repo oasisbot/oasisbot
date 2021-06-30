@@ -1,55 +1,61 @@
 import React from 'react'
 import { Home } from './pages/home'
 import { Route, Switch, withRouter } from 'react-router-dom'
-
-import NavigationBar from './components/navigation/navigation-bar'
-
-import Login from './pages/login'
-import Dashboard from './pages/dashboard'
-import GuildDashboard from './pages/guild-dashboard'
-
-import { User } from './protocol'
+import { useQuery } from 'react-query'
+import { useHistory } from 'react-router'
 
 import { MuiPickersUtilsProvider } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
 
+import Login from './pages/login'
+import Dashboard from './pages/dashboard'
+import GuildDashboard from './pages/guild-dashboard'
+import NavigationBar from './components/navigation/navigation-bar'
+import Dots from './components/misc/dots'
+
+import { User } from './protocol'
+import * as url from './util/url'
+
 interface UserData {
-	done: boolean
 	user: User | undefined
+	loading: boolean
 }
 
 export const UserContext = React.createContext<UserData>({
-	done: false,
 	user: undefined,
+	loading: true
 })
 
 function App() {
-	const [done, setDone] = React.useState(false)
-	const [user, setUser] = React.useState<User | undefined>()
-
-	React.useEffect(() => {
-		const loadData = async () => {
+	const history = useHistory()
+	const { data: user, isLoading } = useQuery(
+		'fetch-user',
+		async () => {
 			const result = await fetch('/api/users/@me')
-			if (result.status === 401) {
-				setDone(true)
+			if (!result.ok && url.isOnAccessPage()) {
+				history.push('/login')
 				return
-			} // Not authenticated
+			} else if (result.status == 401) return
+			return result.json()
+		},
+		{ retry: false }
+	)
 
-			const data = await result.body?.getReader().read()
-			if (!data) {
-				setUser(undefined)
-				setDone(true)
-				return
-			}
-			const user = JSON.parse(
-				new TextDecoder().decode(data.value)
-			) as User
-
-			setUser(user)
-			setDone(true)
-		}
-		loadData()
-	}, [])
+	if (isLoading && url.isOnAccessPage()) {
+		return (
+			<div
+				style={{
+					display: 'flex',
+					width: '100%',
+					minHeight: '100vh',
+					alignItems: 'center',
+					justifyContent: 'center',
+				}}
+			>
+				<Dots />
+			</div>
+		)
+	}
 
 	return (
 		<div
@@ -62,7 +68,7 @@ function App() {
 		>
 			<MuiPickersUtilsProvider utils={DateFnsUtils}>
 				<Switch>
-					<UserContext.Provider value={{ done: done, user: user }}>
+					<UserContext.Provider value={{ user: user, loading: isLoading }}>
 						<Route exact path="/">
 							<NavigationBar />
 							<Home />
