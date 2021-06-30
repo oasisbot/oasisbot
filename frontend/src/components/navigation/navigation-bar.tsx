@@ -211,6 +211,6 @@ export default function NavigationBar() {
 
 const login = () => {
 	window.open(
-		'https://discord.com/api/oauth2/authorize?client_id=749649771639341207&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fauth%2Fcallback&response_type=code&scope=identify%20email%20guilds'
+		'https://discord.com/api/oauth2/authorize?client_id=749649771639341207&redirect_uri=https%3A%2F%2Foasisbot-main.herokuapp.com%2Fauth%2Fcallback&response_type=code&scope=identify%20email%20guilds'
 	)
 }
