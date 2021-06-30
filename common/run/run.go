@@ -70,5 +70,5 @@ func Run() {
 	if port == ":" {
 		port = args.Addr
 	}
-	web.Run(args.Addr)
+	web.Run(port)
 }
