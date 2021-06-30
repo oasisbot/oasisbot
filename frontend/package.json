@@ -43,7 +43,7 @@
 		"build": "react-scripts build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
-		"preinstall": "npx npm-force-resolutions"
+		"preinstall": "npm install --package-lock-only --ignore-scripts && npx npm-force-resolutions"
 	},
 	"proxy": "http://localhost:5000",
 	"eslintConfig": {
